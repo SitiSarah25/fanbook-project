@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BWS Fan Book</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Gowun Dodum', sans-serif;
+        }
+
+        .mypic {
+            width: 100%;
+            height: 300px;
+            background-image: linear-gradient(0deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://i.pinimg.com/736x/58/1b/bd/581bbd3e04e5bd6b1ab28c2b574dc213.jpg');
+            background-position: center;
+            background-size: cover;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mypost {
+            width: 95%;
+            max-width: 500px;
+            margin: 20px auto 20px auto;
+            padding: 20px;
+            box-shadow: 0px 0px 3px 0px black;
+        }
+
+        .mypost>button {
+            margin-top: 15px;
+        }
+
+        .mycards {
+            width: 95%;
+            max-width: 500px;
+            margin: auto;
+        }
+
+        .mycards>.card {
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="mypic">
+        <h1>Byeon Woo Seok Fan Book</h1>
+    </div>
+
+    <div class="mypost">
+        <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="nickname" placeholder="Enter Your Nickname Here">
+            <label for="nickname">Nickname</label>
+        </div>
+        <div class="form-floating">
+            <textarea class="form-control" placeholder="Leave a comment here" id="comment" style="height: 100px"></textarea>
+            <label for="comment">Fan Message</label>
+        </div>
+        <button type="button" class="btn btn-dark" onclick="postMessage()">Leave a fan message</button>
+    </div>
+
+    <div class="mycards" id="message-list">
+    </div>
+
+    <script>
+        function postMessage() {
+            const name = $('#nickname').val();
+            const comment = $('#comment').val();
+
+            if (name === "" || comment === "") {
+                alert('Please fill in both fields');
+                return;
+            }
+
+            $.ajax({
+                type: "POST",
+                url: "/homework",
+                data: { name_give: name, comment_give: comment },
+                success: function (response) {
+                    alert(response['msg']);
+                    $('#nickname').val(''); 
+                    $('#comment').val('');
+                    getMessages(); 
+                }
+            });
+        }
+
+        function getMessages() {
+            $.ajax({
+                type: "GET",
+                url: "/homework",
+                success: function (response) {
+                    let message_list = response['messages'];
+                    $('#message-list').empty(); 
+                    message_list.forEach(function (message) {
+                        let message_html = `
+                            <div class="card">
+                                <div class="card-body">
+                                    <blockquote class="blockquote mb-0">
+                                        <p>${message['comment']}</p>
+                                        <footer class="blockquote-footer">${message['name']}</footer>
+                                    </blockquote>
+                                </div>
+                            </div>`;
+                        $('#message-list').append(message_html);
+                    });
+                }
+            });
+        }  
+
+        $(document).ready(function () {
+            getMessages();
+        });
+    </script>
+
+</body>
+
+</html>
